@@ -64,7 +64,7 @@ Param (
     [switch]$GlobalHttpFirewallAccess,
     [switch]$DisableBasicAuth = $false,
     [switch]$EnableCredSSP,
-    [int]$HttpsPort = 5986,
+    [int]$HttpsPort = 5986
 )
 
 Function Write-Log
