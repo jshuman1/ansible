@@ -63,7 +63,8 @@ Param (
     [switch]$ForceNewSSLCert,
     [switch]$GlobalHttpFirewallAccess,
     [switch]$DisableBasicAuth = $false,
-    [switch]$EnableCredSSP
+    [switch]$EnableCredSSP,
+    [int]$HttpsPort = 5986,
 )
 
 Function Write-Log
@@ -320,6 +321,7 @@ If (!($listeners | Where-Object {$_.Keys -like "TRANSPORT=HTTPS"}))
     $valueset = @{
         Hostname = $SubjectName
         CertificateThumbprint = $thumbprint
+        Port = $HttpsPort
     }
 
     $selectorset = @{
@@ -346,6 +348,7 @@ Else
         $valueset = @{
             CertificateThumbprint = $thumbprint
             Hostname = $SubjectName
+            Port = $HttpsPort
         }
 
         # Delete the listener for SSL
@@ -413,7 +416,7 @@ $fwtest2 = netsh advfirewall firewall show rule name="Allow WinRM HTTPS" profile
 If ($fwtest1.count -lt 5)
 {
     Write-Verbose "Adding firewall rule to allow WinRM HTTPS."
-    netsh advfirewall firewall add rule profile=any name="Allow WinRM HTTPS" dir=in localport=5986 protocol=TCP action=allow
+    netsh advfirewall firewall add rule profile=any name="Allow WinRM HTTPS" dir=in localport=$HttpsPort protocol=TCP action=allow
     Write-Log "Added firewall rule to allow WinRM HTTPS."
 }
 ElseIf (($fwtest1.count -ge 5) -and ($fwtest2.count -lt 5))
